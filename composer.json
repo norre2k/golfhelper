@@ -1,0 +1,11 @@
+{
+  "name": "golfhelper/app",
+  "description": "En enkel PHP-applikation som hjälper golfspelare på olika nivåer",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "GolfHelper\\": "src/"
+    }
+  },
+  "require": {}
+}
