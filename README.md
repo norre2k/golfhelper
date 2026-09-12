@@ -12,7 +12,6 @@ Projektet innehåller även en grundläggande regelsida och en klubbrekommendati
 
 GolfHelper är uppbyggt med PHP-klasser för att funktionerna ska kunna utvecklas och användas i fler delar av applikationen.
 
-Snabbstart (Windows, XAMPP):
 
 1. Placera projektmappen i din XAMPP `htdocs` (om inte redan där).
 2. (Rekommenderat) Kör `composer install` i projektroten för PSR-4-autoload (om du har Composer):
