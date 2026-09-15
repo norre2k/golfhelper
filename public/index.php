@@ -192,19 +192,22 @@ function escape(string $value): string
 </main>
 
 <script>
-const STORAGE_KEY = 'golfhelper_scorecard';
+const SCORECARD_STORAGE_KEY = 'golfhelper_scorecard';
+const PROFILE_STORAGE_KEY = 'golfhelper_profile';
 const scoreInputs = Array.from(document.querySelectorAll('.scorecard-form input[type="number"]'));
+const nameInput = document.getElementById('player_name');
+const levelSelect = document.getElementById('level');
 
 const saveScorecard = () => {
     const values = {};
     scoreInputs.forEach((input) => {
         values[input.name] = input.value;
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    localStorage.setItem(SCORECARD_STORAGE_KEY, JSON.stringify(values));
 };
 
 const restoreScorecard = () => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(SCORECARD_STORAGE_KEY);
     if (!saved) {
         return;
     }
@@ -221,17 +224,53 @@ const restoreScorecard = () => {
     }
 };
 
+const saveProfile = () => {
+    const profile = {
+        name: nameInput ? nameInput.value : '',
+        level: levelSelect ? levelSelect.value : 'beginner'
+    };
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+};
+
+const restoreProfile = () => {
+    const saved = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (!saved) {
+        return;
+    }
+
+    try {
+        const profile = JSON.parse(saved);
+        if (nameInput && typeof profile.name === 'string') {
+            nameInput.value = profile.name;
+        }
+        if (levelSelect && typeof profile.level === 'string') {
+            levelSelect.value = profile.level;
+        }
+    } catch (error) {
+        console.warn('Could not restore profile', error);
+    }
+};
+
 scoreInputs.forEach((input) => {
     input.addEventListener('input', saveScorecard);
 });
+
+if (nameInput) {
+    nameInput.addEventListener('input', saveProfile);
+}
+
+if (levelSelect) {
+    levelSelect.addEventListener('change', saveProfile);
+}
 
 document.getElementById('reset-scorecard')?.addEventListener('click', () => {
     scoreInputs.forEach((input) => {
         input.value = '';
     });
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SCORECARD_STORAGE_KEY);
 });
 
+restoreProfile();
 restoreScorecard();
 </script>
 
