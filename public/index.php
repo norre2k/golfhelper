@@ -7,6 +7,7 @@ use GolfHelper\Levels\Beginner;
 use GolfHelper\Levels\Intermediate;
 use GolfHelper\Levels\Pro;
 use GolfHelper\Rules;
+use GolfHelper\ScoreStatistics;
 
 $players = [
 	'beginner' => Beginner::class,
@@ -29,6 +30,7 @@ $player = null;
 
 $scorecardError = null;
 $scorecardTotal = null;
+$scorecardStats = null;
 $scorecardValues = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -58,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 		if ($scorecardError === null) {
 			$scorecardTotal = array_sum($scorecardValues);
+			$scorecardStats = new ScoreStatistics($scorecardValues);
 		}
 	}
 }
@@ -170,11 +173,21 @@ function escape(string $value): string
 
 			<?php if ($scorecardError !== null): ?>
 				<p class="message error" role="alert"><?php echo escape($scorecardError); ?></p>
-			<?php elseif ($scorecardTotal !== null): ?>
+			<?php elseif ($scorecardTotal !== null && $scorecardStats !== null): ?>
 				<div class="result">
 					<p class="section-label">Total</p>
 					<h3><?php echo escape((string) $scorecardTotal); ?> slag på 9 hål</h3>
-					<p>Genomsnitt per hål: <?php echo escape(number_format($scorecardTotal / 9, 1)); ?></p>
+					<p>Genomsnitt per hål: <?php echo escape(number_format($scorecardStats->getAverage(), 1)); ?></p>
+					<div class="stats-grid">
+						<div>
+							<span>Bästa hål</span>
+							<strong><?php echo escape((string) $scorecardStats->getBestHole()); ?></strong>
+						</div>
+						<div>
+							<span>Svåraste hål</span>
+							<strong><?php echo escape((string) $scorecardStats->getWorstHole()); ?></strong>
+						</div>
+					</div>
 				</div>
 			<?php endif; ?>
 		</section>

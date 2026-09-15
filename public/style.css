@@ -71,6 +71,30 @@ button:hover { background: #be5f2f; }
 .scorecard-form .secondary { background: var(--green); }
 .scorecard-form .secondary:hover { background: var(--green-dark); }
 .scorecard-form .result { margin-top: 18px; }
+.stats-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(120px, 1fr));
+	gap: 12px;
+	margin-top: 16px;
+}
+.stats-grid > div {
+	display: grid;
+	gap: 6px;
+	padding: 12px 14px;
+	background: rgba(255, 255, 255, .35);
+	border: 1px solid rgba(23, 48, 43, .08);
+	border-radius: 4px;
+}
+.stats-grid span {
+	color: var(--muted);
+	font: 700 .72rem/1.2 Arial, sans-serif;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+}
+.stats-grid strong {
+	font-size: 1.55rem;
+	color: var(--green-dark);
+}
 ul { padding-left: 20px; }
 .tip-card ul, .rules-list { margin-bottom: 0; }
 .tip-card li + li, .rules-list li + li { margin-top: 10px; }
