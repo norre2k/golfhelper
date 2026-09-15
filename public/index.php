@@ -1,6 +1,8 @@
 <?php
 require __DIR__ . '/../src/bootstrap.php';
 
+session_start();
+
 use GolfHelper\Levels\Beginner;
 use GolfHelper\Levels\Intermediate;
 use GolfHelper\Levels\Pro;
@@ -18,6 +20,7 @@ $levels = [
 	'pro' => 'Proffs',
 ];
 
+$playerNameInput = $_POST['player_name'] ?? ($_SESSION['golfhelper_name'] ?? '');
 $selectedLevel = $_POST['level'] ?? 'beginner';
 $distanceInput = $_POST['distance'] ?? '';
 $distance = filter_var($distanceInput, FILTER_VALIDATE_FLOAT);
@@ -25,13 +28,19 @@ $error = null;
 $player = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	$cleanName = trim((string) $playerNameInput);
+	if ($cleanName !== '') {
+		$_SESSION['golfhelper_name'] = $cleanName;
+	}
+
 	if (!isset($players[$selectedLevel])) {
 		$error = 'Välj en giltig spelarnivå.';
 	} elseif ($distance === false || $distance < 1 || $distance > 400) {
 		$error = 'Ange ett avstånd mellan 1 och 400 meter.';
 	} else {
 		$playerClass = $players[$selectedLevel];
-		$player = new $playerClass('Du');
+		$playerName = $cleanName !== '' ? $cleanName : 'Du';
+		$player = new $playerClass($playerName);
 	}
 }
 
@@ -56,6 +65,9 @@ function escape(string $value): string
 		<p class="eyebrow">Ditt digitala golfstöd</p>
 		<h1>GolfHelper</h1>
 		<p class="intro">Praktiska tips, regler och hjälp med klubbval för din nivå.</p>
+		<?php if (!empty($_SESSION['golfhelper_name'])): ?>
+			<p class="welcome-banner">Hej <?php echo escape($_SESSION['golfhelper_name']); ?>, här är ditt personliga golfstöd.</p>
+		<?php endif; ?>
 	</div>
 </header>
 
@@ -69,6 +81,10 @@ function escape(string $value): string
 
 	<form method="post" class="club-form">
 			<div class="form-grid">
+				<label for="player_name">Namn
+					<input id="player_name" name="player_name" type="text" value="<?php echo escape($_SESSION['golfhelper_name'] ?? ''); ?>" placeholder="Skriv ditt namn">
+				</label>
+
 				<label for="level">Spelnivå
 					<select id="level" name="level" required>
 						<?php foreach ($levels as $value => $label): ?>
