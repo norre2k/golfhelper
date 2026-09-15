@@ -1,3 +1,5 @@
+# Golf Helper
+
 GolfHelper är en PHP-applikation som fungerar som ett digitalt hjälpmedel för golfspelare på olika nivåer. Projektet samlar grundläggande golfkunskap på en plats och är tänkt att hjälpa användaren att utvecklas, förstå spelet bättre och välja rätt klubba i olika situationer.
 
 Applikationen riktar sig till tre typer av spelare:
