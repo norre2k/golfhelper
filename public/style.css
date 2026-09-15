@@ -66,7 +66,10 @@ button:hover { background: #be5f2f; }
 .tip-card { padding: 18px; background: var(--mint); }
 .scorecard-grid { display: grid; grid-template-columns: repeat(3, minmax(80px, 1fr)); gap: 12px; margin-bottom: 18px; }
 .scorecard-grid label { font-size: .68rem; }
+.scorecard-actions { display: flex; gap: 12px; }
 .scorecard-form button { margin-top: 0; }
+.scorecard-form .secondary { background: var(--green); }
+.scorecard-form .secondary:hover { background: var(--green-dark); }
 .scorecard-form .result { margin-top: 18px; }
 ul { padding-left: 20px; }
 .tip-card ul, .rules-list { margin-bottom: 0; }

@@ -162,7 +162,10 @@ function escape(string $value): string
 						</label>
 					<?php endfor; ?>
 				</div>
-				<button type="submit">Räkna total</button>
+				<div class="scorecard-actions">
+					<button type="submit">Räkna total</button>
+					<button type="button" class="secondary" id="reset-scorecard">Återställ</button>
+				</div>
 			</form>
 
 			<?php if ($scorecardError !== null): ?>
@@ -187,5 +190,50 @@ function escape(string $value): string
 		</section>
 	</div>
 </main>
+
+<script>
+const STORAGE_KEY = 'golfhelper_scorecard';
+const scoreInputs = Array.from(document.querySelectorAll('.scorecard-form input[type="number"]'));
+
+const saveScorecard = () => {
+    const values = {};
+    scoreInputs.forEach((input) => {
+        values[input.name] = input.value;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+};
+
+const restoreScorecard = () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+        return;
+    }
+
+    try {
+        const values = JSON.parse(saved);
+        scoreInputs.forEach((input) => {
+            if (Object.prototype.hasOwnProperty.call(values, input.name) && values[input.name] !== '') {
+                input.value = values[input.name];
+            }
+        });
+    } catch (error) {
+        console.warn('Could not restore scorecard', error);
+    }
+};
+
+scoreInputs.forEach((input) => {
+    input.addEventListener('input', saveScorecard);
+});
+
+document.getElementById('reset-scorecard')?.addEventListener('click', () => {
+    scoreInputs.forEach((input) => {
+        input.value = '';
+    });
+    localStorage.removeItem(STORAGE_KEY);
+});
+
+restoreScorecard();
+</script>
+
 </body>
 </html>
