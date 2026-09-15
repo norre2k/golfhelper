@@ -27,6 +27,10 @@ $distance = filter_var($distanceInput, FILTER_VALIDATE_FLOAT);
 $error = null;
 $player = null;
 
+$scorecardError = null;
+$scorecardTotal = null;
+$scorecardValues = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$cleanName = trim((string) $playerNameInput);
 	if ($cleanName !== '') {
@@ -41,6 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$playerClass = $players[$selectedLevel];
 		$playerName = $cleanName !== '' ? $cleanName : 'Du';
 		$player = new $playerClass($playerName);
+	}
+
+	if (isset($_POST['scorecard_submit'])) {
+		for ($hole = 1; $hole <= 9; $hole++) {
+			$fieldName = 'hole_' . $hole;
+			$value = filter_input(INPUT_POST, $fieldName, FILTER_VALIDATE_INT);
+			$scorecardValues[$hole] = $value !== false ? (int) $value : null;
+			if ($value === false || $value < 0 || $value > 20) {
+				$scorecardError = 'Ange ett poängvärde mellan 0 och 20 för varje hål.';
+			}
+		}
+		if ($scorecardError === null) {
+			$scorecardTotal = array_sum($scorecardValues);
+		}
 	}
 }
 
@@ -130,9 +148,35 @@ function escape(string $value): string
 					</article>
 				<?php endforeach; ?>
 			</div>
-	</section>
+		</section>
 
-	<section class="content-section rules-section" aria-labelledby="rules-title">
+		<section class="content-section" aria-labelledby="scorecard-title">
+			<p class="section-label">Scorekort</p>
+			<h2 id="scorecard-title">Hål 1–9</h2>
+			<form method="post" class="scorecard-form">
+				<input type="hidden" name="scorecard_submit" value="1">
+				<div class="scorecard-grid">
+					<?php for ($hole = 1; $hole <= 9; $hole++): ?>
+						<label for="hole_<?php echo $hole; ?>">Hål <?php echo $hole; ?>
+							<input id="hole_<?php echo $hole; ?>" name="hole_<?php echo $hole; ?>" type="number" min="0" max="20" value="<?php echo escape((string) ($scorecardValues[$hole] ?? '')); ?>" required>
+						</label>
+					<?php endfor; ?>
+				</div>
+				<button type="submit">Räkna total</button>
+			</form>
+
+			<?php if ($scorecardError !== null): ?>
+				<p class="message error" role="alert"><?php echo escape($scorecardError); ?></p>
+			<?php elseif ($scorecardTotal !== null): ?>
+				<div class="result">
+					<p class="section-label">Total</p>
+					<h3><?php echo escape((string) $scorecardTotal); ?> slag på 9 hål</h3>
+					<p>Genomsnitt per hål: <?php echo escape(number_format($scorecardTotal / 9, 1)); ?></p>
+				</div>
+			<?php endif; ?>
+		</section>
+
+		<section class="content-section rules-section" aria-labelledby="rules-title">
 			<p class="section-label">På banan</p>
 			<h2 id="rules-title">Grundregler</h2>
 			<ul class="rules-list">
