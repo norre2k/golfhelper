@@ -1,0 +1,22 @@
+# Composer dependencies
+/vendor/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Local PHP and XAMPP files
+.phpunit.result.cache
+php_errors.log
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
