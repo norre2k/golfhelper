@@ -190,6 +190,19 @@ function escape(string $value): string
 					</div>
 				</div>
 			<?php endif; ?>
+
+			<div class="score-history" aria-labelledby="history-title">
+				<div class="history-heading">
+					<div>
+						<p class="section-label">Sparade rundor</p>
+						<h3 id="history-title">Senaste scorekorten</h3>
+					</div>
+					<button type="button" class="text-button" id="clear-history">Rensa historik</button>
+				</div>
+				<ul class="history-list" id="score-history-list">
+					<li class="history-empty">Inga rundor sparade ännu.</li>
+				</ul>
+			</div>
 		</section>
 
 		<section class="content-section rules-section" aria-labelledby="rules-title">
@@ -207,9 +220,13 @@ function escape(string $value): string
 <script>
 const SCORECARD_STORAGE_KEY = 'golfhelper_scorecard';
 const PROFILE_STORAGE_KEY = 'golfhelper_profile';
+const SCORE_HISTORY_STORAGE_KEY = 'golfhelper_score_history';
+const MAX_HISTORY_ITEMS = 5;
 const scoreInputs = Array.from(document.querySelectorAll('.scorecard-form input[type="number"]'));
+const scorecardForm = document.querySelector('.scorecard-form');
 const nameInput = document.getElementById('player_name');
 const levelSelect = document.getElementById('level');
+const historyList = document.getElementById('score-history-list');
 
 const saveScorecard = () => {
     const values = {};
@@ -264,6 +281,59 @@ const restoreProfile = () => {
     }
 };
 
+const getScoreHistory = () => {
+	try {
+		const saved = JSON.parse(localStorage.getItem(SCORE_HISTORY_STORAGE_KEY) || '[]');
+		return Array.isArray(saved) ? saved : [];
+	} catch (error) {
+		console.warn('Could not restore score history', error);
+		return [];
+	}
+};
+
+const renderScoreHistory = () => {
+	if (!historyList) {
+		return;
+	}
+
+	const history = getScoreHistory();
+	historyList.replaceChildren();
+
+	if (history.length === 0) {
+		const emptyItem = document.createElement('li');
+		emptyItem.className = 'history-empty';
+		emptyItem.textContent = 'Inga rundor sparade ännu.';
+		historyList.appendChild(emptyItem);
+		return;
+	}
+
+	history.forEach((round) => {
+		const item = document.createElement('li');
+		const date = document.createElement('span');
+		const total = document.createElement('strong');
+		date.textContent = typeof round.date === 'string' ? round.date : 'Okänt datum';
+		total.textContent = `${Number(round.total) || 0} slag`;
+		item.append(date, total);
+		historyList.appendChild(item);
+	});
+};
+
+const saveRoundToHistory = () => {
+	const scores = scoreInputs.map((input) => Number(input.value));
+	if (scores.length !== 9 || scores.some((score) => !Number.isInteger(score) || score < 0 || score > 20)) {
+		return;
+	}
+
+	const history = getScoreHistory();
+	const newRound = {
+		date: new Date().toLocaleDateString('sv-SE'),
+		total: scores.reduce((total, score) => total + score, 0)
+	};
+	const updatedHistory = [newRound, ...history].slice(0, MAX_HISTORY_ITEMS);
+	localStorage.setItem(SCORE_HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory));
+	renderScoreHistory();
+};
+
 scoreInputs.forEach((input) => {
     input.addEventListener('input', saveScorecard);
 });
@@ -276,6 +346,13 @@ if (levelSelect) {
     levelSelect.addEventListener('change', saveProfile);
 }
 
+scorecardForm?.addEventListener('submit', saveRoundToHistory);
+
+document.getElementById('clear-history')?.addEventListener('click', () => {
+	localStorage.removeItem(SCORE_HISTORY_STORAGE_KEY);
+	renderScoreHistory();
+});
+
 document.getElementById('reset-scorecard')?.addEventListener('click', () => {
     scoreInputs.forEach((input) => {
         input.value = '';
@@ -285,6 +362,7 @@ document.getElementById('reset-scorecard')?.addEventListener('click', () => {
 
 restoreProfile();
 restoreScorecard();
+renderScoreHistory();
 </script>
 
 </body>
