@@ -39,16 +39,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$_SESSION['golfhelper_name'] = $cleanName;
 	}
 
-	if (!isset($players[$selectedLevel])) {
-		$error = 'Välj en giltig spelarnivå.';
-	} elseif ($distance === false || $distance < 1 || $distance > 400) {
-		$error = 'Ange ett avstånd mellan 1 och 400 meter.';
-	} else {
-		$playerClass = $players[$selectedLevel];
-		$playerName = $cleanName !== '' ? $cleanName : 'Du';
-		$player = new $playerClass($playerName);
-	}
-
 	if (isset($_POST['scorecard_submit'])) {
 		for ($hole = 1; $hole <= 9; $hole++) {
 			$fieldName = 'hole_' . $hole;
@@ -62,6 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$scorecardTotal = array_sum($scorecardValues);
 			$scorecardStats = new ScoreStatistics($scorecardValues);
 		}
+	} elseif (!isset($players[$selectedLevel])) {
+		$error = 'Välj en giltig spelarnivå.';
+	} elseif ($distance === false || $distance < 1 || $distance > 400) {
+		$error = 'Ange ett avstånd mellan 1 och 400 meter.';
+	} else {
+		$playerClass = $players[$selectedLevel];
+		$playerName = $cleanName !== '' ? $cleanName : 'Du';
+		$player = new $playerClass($playerName);
 	}
 }
 
