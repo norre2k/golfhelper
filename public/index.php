@@ -43,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		for ($hole = 1; $hole <= 9; $hole++) {
 			$fieldName = 'hole_' . $hole;
 			$value = filter_input(INPUT_POST, $fieldName, FILTER_VALIDATE_INT);
-			$scorecardValues[$hole] = $value !== false ? (int) $value : null;
-			if ($value === false || $value < 0 || $value > 20) {
+			$scorecardValues[$hole] = is_int($value) ? $value : null;
+			if ($value === null || $value === false || $value < 0 || $value > 20) {
 				$scorecardError = 'Ange ett poängvärde mellan 0 och 20 för varje hål.';
 			}
 		}
