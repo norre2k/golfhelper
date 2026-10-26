@@ -10,3 +10,4 @@ Applikationen riktar sig till tre typer av spelare:
 
 Projektet innehåller även en grundläggande regelsida och en klubbrekommendation som utgår från slagets avstånd och spelarens nivå. Webbgränssnittet visar just nu exempel på spelarnivåer, golfregler och rekommenderade klubbor.
 
+test version
